@@ -8,13 +8,13 @@ https://github.com/aquova/aseprite-scripts
 
 Currently, script support is only available in the v1.2.10 Beta, so it is required to install that first.
 
-Once the beta version is installed, open the Scripts folder via File->Scripts->Open Scripts Folder. Simply move the files into that folder to install. Once there, scripts can be run via File->Scripts->SCRIPT NAME. You may need to restart Aseprite first for the scripts to show up.
+Once the beta version is installed, open the Scripts folder via `File->Scripts->Open Scripts Folder`. Simply move the files into that folder to install. Once there, scripts can be run via `File->Scripts->SCRIPT NAME`. You may need to restart Aseprite first for the scripts to show up.
 
 ## -- Scripts --
 
 ### -- Color Compliment --
 
-This script asks for a single color and returns the color compliment according to the color wheel. For example, inputting red will return green and vice versa.
+This script asks for a single color and returns the HSV color compliment according to the color wheel.
 
 ### -- Hue Generator --
 
