@@ -6,9 +6,7 @@ https://github.com/aquova/aseprite-scripts
 
 ## -- Installation --
 
-Currently, script support is only available in the v1.2.10 Beta, so it is required to install that first.
-
-Once the beta version is installed, open the Scripts folder via `File->Scripts->Open Scripts Folder`. Simply move the files into that folder to install. Once there, scripts can be run via `File->Scripts->SCRIPT NAME`. You may need to restart Aseprite first for the scripts to show up.
+To install, open the Scripts folder via `File->Scripts->Open Scripts Folder`. Simply move the files into that folder to install. Once there, scripts can be run via `File->Scripts->SCRIPT NAME`. You may need to use the 'Rescan Scripts Folder' option for them to show up.
 
 ## -- Scripts --
 
@@ -23,3 +21,7 @@ This script asks for two colors and the number of intermediate colors you wish t
 ### -- Shade Generator --
 
 This script will give a range of shades brighter and darker than the color that is given, ranging from black up to white.
+
+### -- Draw Circle --
+
+This script will draw a circle at the specified (X, Y) position at a specified radius, using the currently set foreground color.
