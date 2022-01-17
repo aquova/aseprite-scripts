@@ -10,6 +10,10 @@ To install, open the Scripts folder via `File->Scripts->Open Scripts Folder`. Si
 
 ## -- Scripts --
 
+### -- Pico-8 Dithering --
+
+Converts the canvas to the Pico-8 palette, using Floyd-Steinberg dithering to achieve a more accurate image.
+
 ### -- Color Compliment --
 
 This script asks for a single color and returns the HSV color compliment according to the color wheel.
