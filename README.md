@@ -29,3 +29,7 @@ This script will give a range of shades brighter and darker than the color that 
 ### -- Draw Circle --
 
 This script will draw a circle at the specified (X, Y) position at a specified radius, using the currently set foreground color.
+
+### -- Draw Sine --
+
+This script will draw a sine wave across active image cell with specified wave frequency and wave dampening.
