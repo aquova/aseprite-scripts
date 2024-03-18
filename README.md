@@ -10,9 +10,9 @@ To install, open the Scripts folder via `File->Scripts->Open Scripts Folder`. Si
 
 ## -- Scripts --
 
-### -- Pico-8 Dithering --
+### -- Pico Dithering --
 
-Converts the canvas to the Pico-8 palette, using Floyd-Steinberg dithering to achieve a more accurate image.
+Converts the canvas to the Pico-8 or Picotron palette, using Floyd-Steinberg dithering to achieve a more accurate image.
 
 ### -- Color Compliment --
 

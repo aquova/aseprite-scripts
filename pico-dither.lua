@@ -1,8 +1,6 @@
--- Aseprite script to convert an image into the Pico-8 palette with Floyd-Steinberg dithering
--- Written by aquova, 2022
+-- Aseprite script to convert an image into the Pico-8/Picotron palette with Floyd-Steinberg dithering
+-- Written by aquova, 2022-2024
 -- https://github.com/aquova/aseprite-scripts
-
-PAL_ID = "PICO-8"
 
 PICO8_PALETTE = {
     {r =   0, g =   0, b =   0},
@@ -23,6 +21,59 @@ PICO8_PALETTE = {
     {r = 255, g = 204, b = 170},
 }
 
+PICOTRON_PALETTE = {
+    {r =   0, g =   0, b =   0},
+    {r = 108, g =  51, b =  44},
+    {r = 160, g =  87, b =  61},
+    {r = 239, g = 139, b = 116},
+    {r = 247, g = 206, b = 175},
+    {r = 234, g =  51, b =  82},
+    {r = 179, g =  37, b =  77},
+    {r = 116, g =  44, b =  82},
+    {r =  69, g =  46, b =  56},
+    {r =  94, g =  87, b =  80},
+    {r = 158, g = 137, b = 123},
+    {r = 194, g = 195, b = 199},
+    {r = 253, g = 242, b = 233},
+    {r = 243, g = 176, b = 196},
+    {r = 238, g = 127, b = 167},
+    {r = 209, g =  48, b = 167},
+    {r =  32, g =  43, b =  80},
+    {r =  48, g =  93, b = 166},
+    {r =  73, g = 162, b = 160},
+    {r =  86, g = 170, b = 248},
+    {r = 133, g = 220, b = 243},
+    {r = 183, g = 155, b = 218},
+    {r = 129, g = 118, b = 153},
+    {r = 111, g =  80, b = 147},
+    {r =  39, g =  82, b =  88},
+    {r =  58, g = 133, b =  86},
+    {r =  79, g = 175, b =  92},
+    {r = 104, g = 225, b =  84},
+    {r = 165, g = 234, b =  95},
+    {r = 252, g = 237, b =  87},
+    {r = 242, g = 167, b =  59},
+    {r = 219, g = 114, b =  44},
+}
+
+PALETTE = nil
+
+-- Prompt user for which platform they prefer
+function userInput()
+    local dlg = Dialog()
+
+    dlg:combobox{
+        id="platform",
+        label="Which system palette to use? ",
+        option="Pico-8",
+        options={"Pico-8", "Picotron"},
+    }
+    dlg:button{ id="ok", text="Select" }
+    dlg:show()
+
+    return dlg.data
+end
+
 function convertImage()
     -- Get the current image
     local img = app.activeCel.image
@@ -39,9 +90,9 @@ function convertImage()
     -- Duplicate image into our buffer
     local copy = img:clone()
 
-    -- Set Pico-8 palette
+    -- Set specified palette
     local spr = app.activeSprite
-    local pal = Palette{ fromResource = PAL_ID }
+    local pal = createPalette()
     spr:setPalette(pal)
 
     for y = 0, copy.height - 1 do
@@ -77,18 +128,28 @@ function convertImage()
     img:drawImage(copy)
 end
 
+-- Creates a new palette from the tables above
+function createPalette()
+    local pal = Palette(#PALETTE)
+    for i, v in pairs(PALETTE) do
+        local color = app.pixelColor.rgba(v.r, v.g, v.b, 0xFF)
+        pal:setColor(i - 1, color)
+    end
+    return pal
+end
+
 -- Uses Euclidean distance to find closest matching palette color
 function findClosestColor(p)
     local best_dist = 999999
     local best_idx = 0
-    for k, v in pairs(PICO8_PALETTE) do
+    for k, v in pairs(PALETTE) do
         local dist = colorDist(p, v)
         if dist < best_dist then
             best_dist = dist
             best_idx = k
         end
     end
-    return PICO8_PALETTE[best_idx]
+    return PALETTE[best_idx]
 end
 
 -- Calculates the square of Euclidean distance
@@ -141,5 +202,14 @@ function clamp(v)
 end
 
 do
-    convertImage()
+    local palette = userInput()
+    if palette.ok then
+        local pal = palette.platform
+        if pal == "Pico-8" then
+            PALETTE = PICO8_PALETTE
+        else
+            PALETTE = PICOTRON_PALETTE
+        end
+        convertImage()
+    end
 end
