@@ -1,62 +1,43 @@
 -- Aseprite script to convert an image into the Pico-8/Picotron palette with Floyd-Steinberg dithering
--- Written by aquova, 2022-2024
+-- Written by aquova, 2022-2026
 -- https://github.com/aquova/aseprite-scripts
 
-PICO8_PALETTE = {
-    {r =   0, g =   0, b =   0},
-    {r =  29, g =  43, b =  83},
-    {r = 126, g =  37, b =  83},
-    {r =   0, g = 135, b =  81},
-    {r = 171, g =  82, b =  54},
-    {r =  95, g =  87, b =  79},
-    {r = 194, g = 195, b = 199},
-    {r = 255, g = 241, b = 232},
-    {r = 255, g =   0, b =  77},
-    {r = 255, g = 163, b =   0},
-    {r = 255, g = 236, b =  39},
-    {r =   0, g = 228, b =  54},
-    {r =  41, g = 173, b = 255},
-    {r = 131, g = 118, b = 156},
-    {r = 255, g = 119, b = 168},
-    {r = 255, g = 204, b = 170},
+PALETTE = {
+    0x000000,
+    0x1d2b53,
+    0x7e2553,
+    0x008751,
+    0xab5236,
+    0x5f574f,
+    0xc2c3c7,
+    0xfff1e8,
+    0xff004d,
+    0xffa300,
+    0xffec27,
+    0x00e436,
+    0x29adff,
+    0x83769c,
+    0xff77a8,
+    0xffccaa,
+    0x2463b0,
+    0x00a5a1,
+    0x654688,
+    0x125359,
+    0x742f29,
+    0x452d32,
+    0xa28879,
+    0xffacc5,
+    0xb9003e,
+    0xe26b02,
+    0x95f042,
+    0x00b251,
+    0x64dff6,
+    0xbd9adf,
+    0xe40dab,
+    0xff8557,
 }
 
-PICOTRON_PALETTE = {
-    {r =   0, g =   0, b =   0},
-    {r = 108, g =  51, b =  44},
-    {r = 160, g =  87, b =  61},
-    {r = 239, g = 139, b = 116},
-    {r = 247, g = 206, b = 175},
-    {r = 234, g =  51, b =  82},
-    {r = 179, g =  37, b =  77},
-    {r = 116, g =  44, b =  82},
-    {r =  69, g =  46, b =  56},
-    {r =  94, g =  87, b =  80},
-    {r = 158, g = 137, b = 123},
-    {r = 194, g = 195, b = 199},
-    {r = 253, g = 242, b = 233},
-    {r = 243, g = 176, b = 196},
-    {r = 238, g = 127, b = 167},
-    {r = 209, g =  48, b = 167},
-    {r =  32, g =  43, b =  80},
-    {r =  48, g =  93, b = 166},
-    {r =  73, g = 162, b = 160},
-    {r =  86, g = 170, b = 248},
-    {r = 133, g = 220, b = 243},
-    {r = 183, g = 155, b = 218},
-    {r = 129, g = 118, b = 153},
-    {r = 111, g =  80, b = 147},
-    {r =  39, g =  82, b =  88},
-    {r =  58, g = 133, b =  86},
-    {r =  79, g = 175, b =  92},
-    {r = 104, g = 225, b =  84},
-    {r = 165, g = 234, b =  95},
-    {r = 252, g = 237, b =  87},
-    {r = 242, g = 167, b =  59},
-    {r = 219, g = 114, b =  44},
-}
-
-PALETTE = nil
+PICO8 = true
 
 -- Prompt user for which platform they prefer
 function userInput()
@@ -100,7 +81,7 @@ function convertImage()
             -- Iterate over every pixel, finding closest Pico-8 color
             local p = copy:getPixel(x, y)
             local old = createRgbTable(p)
-            local closest = findClosestColor(old)
+            local closest = hex2rgb(findClosestColor(old))
             local err = sub(old, closest)
 
             local packed = app.pixelColor.rgba(closest.r, closest.g, closest.b, 0xFF)
@@ -130,8 +111,10 @@ end
 
 -- Creates a new palette from the tables above
 function createPalette()
-    local pal = Palette(#PALETTE)
-    for i, v in pairs(PALETTE) do
+    local len = PICO8 and 16 or 32
+    local pal = Palette(len)
+    for i = 1, len do
+        local v = hex2rgb(PALETTE[i])
         local color = app.pixelColor.rgba(v.r, v.g, v.b, 0xFF)
         pal:setColor(i - 1, color)
     end
@@ -142,11 +125,12 @@ end
 function findClosestColor(p)
     local best_dist = 999999
     local best_idx = 0
-    for k, v in pairs(PALETTE) do
-        local dist = colorDist(p, v)
+    local pal_len = PICO8 and 16 or 32
+    for i = 1, pal_len do
+        local dist = colorDist(p, hex2rgb(PALETTE[i]))
         if dist < best_dist then
             best_dist = dist
-            best_idx = k
+            best_idx = i
         end
     end
     return PALETTE[best_idx]
@@ -162,6 +146,15 @@ function createRgbTable(p)
     local r = app.pixelColor.rgbaR(p)
     local g = app.pixelColor.rgbaG(p)
     local b = app.pixelColor.rgbaB(p)
+
+    return {r = r, g = g, b = b}
+end
+
+-- Converts a 24-bit color hex value into a Lua RGB table
+function hex2rgb(_hex)
+    local r = (_hex & 0xFF0000) >> 16
+    local g = (_hex & 0xFF00) >> 8
+    local b = _hex & 0xFF
 
     return {r = r, g = g, b = b}
 end
@@ -205,10 +198,8 @@ do
     local palette = userInput()
     if palette.ok then
         local pal = palette.platform
-        if pal == "Pico-8" then
-            PALETTE = PICO8_PALETTE
-        else
-            PALETTE = PICOTRON_PALETTE
+        if pal ~= "Pico-8" then
+            PICO8 = false
         end
         convertImage()
     end
